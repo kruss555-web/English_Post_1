@@ -44,7 +44,7 @@ MAX_EXPLANATION = 200
 def level_line(q):
     """Строка вида «C1 (Advanced) · Vocabulary: Prepositions»."""
     # return f"{LEVELS[q['level']]} · {q['topic']}"
-    return f"{LEVELS[q['level']]} · {q['topic']}"
+    return f"{LEVELS[q['level']]} <i>12311111</i>· {q['topic']}"
 
 
 def poll_text(q):
