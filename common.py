@@ -43,12 +43,14 @@ MAX_EXPLANATION = 200
 
 def level_line(q):
     """Строка вида «C1 (Advanced) · Vocabulary: Prepositions»."""
+    # return f"{LEVELS[q['level']]} · {q['topic']}"
     return f"{LEVELS[q['level']]} · {q['topic']}"
 
 
 def poll_text(q):
     """Текст вопроса в опросе: строка с уровнем (без эмодзи) + сам вопрос."""
-    return f"{level_line(q)}{HEADER_SEP}{q['question']}"
+    # return f"{level_line(q)}{HEADER_SEP}{q['question']}"
+    return f"{q['question']}"
 
 
 def validate(q):
