@@ -1,0 +1,47 @@
+name: English_Post_Lit — публикация поста
+
+on:
+  workflow_dispatch:   # ручной запуск: Actions → этот workflow → Run workflow
+  # Автопубликация выключена. Чтобы включить, уберите «#» перед тремя строками ниже.
+  # Время в UTC. Для двух постов в день добавьте вторую строку cron
+  # и поставьте в Settings → Variables значение POSTS_PER_DAY = 2.
+  # schedule:
+  #   - cron: "0 15 * * *"
+
+permissions:
+  contents: write
+
+# Публикация и пополнение банка не должны работать одновременно
+concurrency:
+  group: english-post-lit
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Опубликовать пост
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # При ручном запуске публикуем даже если сегодня уже было
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          POSTS_PER_DAY: ${{ vars.POSTS_PER_DAY || '1' }}
+        run: python3 bot.py
+
+      - name: Сохранить очередь в репозитории
+        if: ${{ always() }}
+        run: |
+          git config user.name "English_Post_Lit bot"
+          git config user.email "english-post-lit-bot@users.noreply.github.com"
+          git add state_passages.json
+          if git diff --cached --quiet; then
+            echo "Изменений нет."
+          else
+            git commit -m "bot: update queue"
+            git pull --rebase
+            git push
+          fi
