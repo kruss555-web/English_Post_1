@@ -533,6 +533,8 @@ def main():
             b.attempt(book, cand, im, classify(im))
     except llm.SoftStop as e:
         print(f"Остановка (прогресс сохранён): {e}")
+        print("Это временная перегрузка или лимит Gemini. Запустите пополнение снова через 15-30 минут "
+              "(или завтра, если исчерпан суточный лимит).")
     except llm.Fatal as e:
         print(f"ОШИБКА: {e}")
         return 1
