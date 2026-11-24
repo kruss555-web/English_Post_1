@@ -19,35 +19,82 @@ class Fatal(Exception):
     """Ошибка настройки (неверный ключ, имя модели): запуск помечается как неудачный."""
 
 
-def gemini(prompt, temperature):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent"
-    body = json.dumps({
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": temperature, "responseMimeType": "application/json"},
-    }).encode("utf-8")
+class _Unavailable(Exception):
+    """Модель перегружена или недоступна (503, 429 и т. п.): можно подождать или взять запасную."""
+
+
+class _NoModel(Exception):
+    """Модели с таким именем нет (404)."""
+
+
+# Запасные модели на случай перегрузки основной (через запятую; у каждой модели свои лимиты)
+FALLBACK_MODELS = [m.strip() for m in (os.environ.get("GEMINI_FALLBACK_MODELS") or "gemini-flash-lite-latest").split(",")
+                   if m.strip()]
+
+
+def _short(detail):
+    """Достаёт из ответа ошибки короткое сообщение вместо длинного JSON."""
+    try:
+        err = json.loads(detail).get("error", {})
+        return f"{err.get('status', '')} {err.get('message', '')}".strip() or detail[:200]
+    except (ValueError, AttributeError):
+        return detail[:200]
+
+
+def _request(model, body):
+    """Один запрос к одной модели: при перегрузке подождать и повторить."""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     headers = {"Content-Type": "application/json", "x-goog-api-key": API_KEY}
-    waits = [20, 45, 90]
-    data = None
+    waits = [20, 45]
+    last = ""
     for attempt in range(len(waits) + 1):
         req = urllib.request.Request(url, data=body, headers=headers, method="POST")
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
-                data = json.load(r)
-            break
+                return json.load(r)
         except urllib.error.HTTPError as e:
-            detail = e.read().decode("utf-8", "replace")[:300]
+            detail = _short(e.read().decode("utf-8", "replace"))
             if e.code in (429, 500, 502, 503, 504):
+                last = f"{e.code} {detail}"
                 if attempt < len(waits):
-                    print(f"  Gemini вернул {e.code}, жду {waits[attempt]} с и повторяю...")
+                    print(f"  {model}: {e.code}, жду {waits[attempt]} с и повторяю...")
                     time.sleep(waits[attempt])
                     continue
-                raise SoftStop(f"Gemini {e.code}: {detail}")
+                raise _Unavailable(last)
+            if e.code == 404:
+                raise _NoModel(detail)
             raise Fatal(f"Gemini API {e.code}: {detail}")
         except (urllib.error.URLError, TimeoutError) as e:
+            last = f"сеть: {e}"
             if attempt < len(waits):
                 time.sleep(waits[attempt])
                 continue
-            raise SoftStop(f"сеть недоступна: {e}")
+            raise _Unavailable(last)
+
+
+def gemini(prompt, temperature):
+    body = json.dumps({
+        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
+        "generationConfig": {"temperature": temperature, "responseMimeType": "application/json"},
+    }).encode("utf-8")
+    models = [MODEL] + [m for m in FALLBACK_MODELS if m != MODEL]
+    errors, data = [], None
+    for i, model in enumerate(models):
+        try:
+            data = _request(model, body)
+            if i > 0:
+                print(f"  (ответила запасная модель {model})")
+            break
+        except _NoModel as e:
+            if i == 0:
+                raise Fatal(f"Модель {model} не найдена, проверьте GEMINI_MODEL: {e}")
+            print(f"  запасная модель {model} недоступна, пропускаю")
+        except _Unavailable as e:
+            errors.append(f"{model}: {e}")
+            if i + 1 < len(models):
+                print(f"  {model} перегружена, пробую запасную модель...")
+    if data is None:
+        raise SoftStop("; ".join(errors) or "все модели недоступны")
     try:
         parts = data["candidates"][0]["content"]["parts"]
         return "".join(p.get("text", "") for p in parts if not p.get("thought"))
