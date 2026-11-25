@@ -1,0 +1,77 @@
+name: English_Post_Lit — публикация поста
+
+on:
+  schedule:
+    # Время в UTC. Одна строка cron = один пост в день.
+    # Для двух постов в день добавьте вторую строку и поставьте в Settings → Variables значение POSTS_PER_DAY = 2.
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Что сделать: post (обычный пост) или format_test (образец всеми способами оформления)"
+        type: choice
+        options:
+          - post
+          - format_test
+        default: post
+      format:
+        description: "Оформление: auto берёт значение переменной POST_FORMAT (если её нет, то description → article → classic)"
+        type: choice
+        options:
+          - auto
+          - description
+          - article
+          - card
+          - classic
+        default: auto
+      dry_run:
+        description: "Только показать в логе, ничего не отправлять"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# Публикация и пополнение банка не должны работать одновременно
+concurrency:
+  group: english-post-lit
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Подготовить картинки (нужно только для оформления card)
+        if: ${{ github.event.inputs.mode == 'format_test' || github.event.inputs.format == 'card' || vars.POST_FORMAT == 'card' }}
+        run: |
+          python3 -m pip install --quiet --break-system-packages pillow || python3 -m pip install --quiet pillow
+          fc-list | grep -qi dejavu || sudo apt-get install -y -qq fonts-dejavu-core
+
+      - name: Опубликовать
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          POST_FORMAT: ${{ (github.event.inputs.format != 'auto' && github.event.inputs.format) || vars.POST_FORMAT || 'auto' }}
+          FORMAT_TEST: ${{ github.event.inputs.mode == 'format_test' && '1' || '0' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' && '1' || '0' }}
+          # При ручном запуске публикуем независимо от дневного лимита
+          FORCE: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          POSTS_PER_DAY: ${{ vars.POSTS_PER_DAY || '1' }}
+        run: python3 bot.py
+
+      - name: Сохранить очередь в репозитории
+        if: ${{ always() }}
+        run: |
+          git config user.name "English_Post_Lit bot"
+          git config user.email "english-post-lit-bot@users.noreply.github.com"
+          git add state.json
+          if git diff --cached --quiet; then
+            echo "Изменений нет."
+          else
+            git commit -m "bot: update queue"
+            git pull --rebase
+            git push
+          fi
