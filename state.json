@@ -1,1 +1,12 @@
-{}
+{
+  "cycle": 1,
+  "queue": [
+    "q0001"
+  ],
+  "done": [
+    "q0002"
+  ],
+  "last_id": "q0002",
+  "last_date": "2026-11-25",
+  "posts_today": 1
+}
