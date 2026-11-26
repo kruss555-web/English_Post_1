@@ -115,7 +115,7 @@ def main():
 
     item, new_state = choose_next(good, state, random.Random())
     print(f"Пост {item['id']} (круг {new_state['cycle']}, осталось в круге: {len(new_state['queue'])})")
-    print(quote_html(item) + "\n" + poll_question(item) + "\n" + "\n".join(
+    print(quote_html(item) + "\n111" + "\n" + poll_question(item) + "\n" + "\n".join(
         f" {'*' if i == item['correct'] else '-'} {o}" for i, o in enumerate(item["options"])))
 
     if DRY_RUN:
