@@ -73,7 +73,7 @@ def poll_question(item):
 
 def quote_html(item):
     """Цитата жирным, ниже курсивом источник: обычный HTML Telegram (подходит и для сообщения, и для описания опроса)."""
-    return f"<b>{_esc(item['text'])}</b>\n🪶 <i> — {_esc(source_line(item))} —</i>\n\n \n\n"
+    return f"📗  <b>{_esc(item['text'])}</b>\n<i>— {_esc(source_line(item))}</i>\n\n〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️〰️\n\n"
 
 
 def validate_item(it):
