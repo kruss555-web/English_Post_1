@@ -1,0 +1,51 @@
+name: English_Post_Lit — пополнение банка
+
+on:
+  schedule:
+    # Время в UTC: ночное пополнение банка постов до BANK_TARGET.
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    inputs:
+      count:
+        description: "Сколько постов добавить (пусто = пополнить до цели BANK_TARGET)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: english-post-lit
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Собрать посты
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # Необязательные настройки: Settings → Secrets and variables → Actions → Variables
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          GEMINI_FALLBACK_MODELS: ${{ vars.GEMINI_FALLBACK_MODELS }}
+          EXPLANATION_LANG: ${{ vars.EXPLANATION_LANG || 'Russian' }}
+          BANK_TARGET: ${{ vars.BANK_TARGET || '365' }}
+          BANK_COUNT: ${{ github.event.inputs.count }}
+        run: python3 build_bank.py
+
+      - name: Сохранить банк в репозитории
+        if: ${{ always() }}
+        run: |
+          git config user.name "English_Post_Lit bot"
+          git config user.email "english-post-lit-bot@users.noreply.github.com"
+          git add bank.json
+          if git diff --cached --quiet; then
+            echo "Изменений нет."
+          else
+            git commit -m "bot: update bank"
+            git pull --rebase
+            git push
+          fi
