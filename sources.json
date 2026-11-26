@@ -1,0 +1,37 @@
+{
+  "original_share": 0.25,
+  "books": [
+    {"id": "aesop_fables_v-s-vernon-jones",                         "title": "Aesop's Fables",                    "author": "Aesop",                    "genre": "fable",       "form": "prose"},
+    {"id": "jacob-grimm_wilhelm-grimm_household-tales_margaret-hunt", "title": "Grimm's Fairy Tales",               "author": "Brothers Grimm",           "genre": "fairy tale",  "form": "prose"},
+    {"id": "a-n-afanasyev_russian-folktales_leonard-a-magnus",       "title": "Russian Folk Tales",                "author": "A. N. Afanasyev",          "genre": "folk tale",   "form": "prose"},
+    {"id": "joseph-jacobs_indian-fairy-tales",                       "title": "Indian Fairy Tales",                "author": "Joseph Jacobs",            "genre": "folk tale",   "form": "prose"},
+    {"id": "james-stephens_irish-fairy-tales",                       "title": "Irish Fairy Tales",                 "author": "James Stephens",           "genre": "folk tale",   "form": "prose"},
+    {"id": "oscar-wilde_childrens-stories",                          "title": "The Happy Prince and Other Tales",  "author": "Oscar Wilde",              "genre": "fairy tale",  "form": "prose"},
+    {"id": "lewis-carroll_alices-adventures-in-wonderland_john-tenniel", "title": "Alice's Adventures in Wonderland", "author": "Lewis Carroll",         "genre": "classic",     "form": "prose"},
+    {"id": "lewis-carroll_through-the-looking-glass_john-tenniel",   "title": "Through the Looking-Glass",         "author": "Lewis Carroll",            "genre": "classic",     "form": "prose"},
+    {"id": "l-frank-baum_the-wonderful-wizard-of-oz",                "title": "The Wonderful Wizard of Oz",        "author": "L. Frank Baum",            "genre": "classic",     "form": "prose"},
+    {"id": "kenneth-grahame_the-wind-in-the-willows",                "title": "The Wind in the Willows",           "author": "Kenneth Grahame",          "genre": "classic",     "form": "prose"},
+    {"id": "j-m-barrie_peter-and-wendy",                             "title": "Peter and Wendy",                   "author": "J. M. Barrie",             "genre": "classic",     "form": "prose"},
+    {"id": "e-nesbit_five-children-and-it",                          "title": "Five Children and It",              "author": "E. Nesbit",                "genre": "humor",       "form": "prose"},
+    {"id": "beatrix-potter_short-fiction",                           "title": "The Tales of Beatrix Potter",       "author": "Beatrix Potter",           "genre": "fairy tale",  "form": "prose"},
+    {"id": "jerome-k-jerome_three-men-in-a-boat",                    "title": "Three Men in a Boat",               "author": "Jerome K. Jerome",         "genre": "humor",       "form": "prose"},
+    {"id": "mark-twain_the-adventures-of-tom-sawyer",                "title": "The Adventures of Tom Sawyer",      "author": "Mark Twain",               "genre": "humor",       "form": "prose"},
+    {"id": "p-g-wodehouse_jeeves-stories",                           "title": "Jeeves Stories",                    "author": "P. G. Wodehouse",          "genre": "humor",       "form": "prose"},
+    {"id": "arthur-conan-doyle_the-adventures-of-sherlock-holmes",   "title": "The Adventures of Sherlock Holmes", "author": "Arthur Conan Doyle",       "genre": "detective",   "form": "prose"},
+    {"id": "robert-louis-stevenson_treasure-island",                 "title": "Treasure Island",                   "author": "Robert Louis Stevenson",   "genre": "adventure",   "form": "prose"},
+    {"id": "jack-london_the-call-of-the-wild",                       "title": "The Call of the Wild",              "author": "Jack London",              "genre": "adventure",   "form": "prose"},
+    {"id": "charles-dickens_a-christmas-carol",                      "title": "A Christmas Carol",                 "author": "Charles Dickens",          "genre": "classic",     "form": "prose"},
+    {"id": "edward-lear_nonsense-books",                             "title": "A Book of Nonsense",                "author": "Edward Lear",              "genre": "nonsense poem", "form": "verse"},
+    {"id": "robert-frost_new-hampshire",                             "title": "New Hampshire",                     "author": "Robert Frost",             "genre": "poem",        "form": "verse"}
+  ],
+  "originals": [
+    {"genre": "rock ballad style",       "form": "verse", "brief": "an emotional rock-ballad style lyric about an everyday funny or touching situation"},
+    {"genre": "rap style",               "form": "verse", "brief": "a witty rap-style verse with simple rhymes about a relatable everyday problem"},
+    {"genre": "pop chorus style",        "form": "verse", "brief": "a catchy pop-chorus style lyric about a small dramatic moment (a late bus, a lost phone, a bad haircut)"},
+    {"genre": "country song style",      "form": "verse", "brief": "a storytelling country-song style lyric with a funny twist"},
+    {"genre": "funny dialogue",          "form": "prose", "brief": "a short funny dialogue between two people with a misunderstanding"},
+    {"genre": "fairy tale with a twist", "form": "prose", "brief": "a tiny fairy tale scene with a modern, funny twist"},
+    {"genre": "pet diary",               "form": "prose", "brief": "a funny diary entry written by a clever pet"},
+    {"genre": "limerick",                "form": "verse", "brief": "a funny five-line limerick"}
+  ]
+}
